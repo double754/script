@@ -1,0 +1,42 @@
+name: Compress All Commits
+
+on:
+  push:
+    branches: [ main ]  # Adjust branch name as needed
+
+jobs:
+  compress:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "github-actions-bot@users.noreply.github.com"
+
+      - name: Compress Commits
+        run: |
+          # Create temporary orphan branch
+          git checkout --orphan temp_branch
+          
+          # Add all files
+          git add -A
+          
+          # Commit with message "auto compress"
+          git commit -m "auto compress"
+          
+          # Delete the main branch
+          git branch -D main
+          
+          # Rename temp branch to main
+          git branch -m main
+          
+          # Force push to remote
+          git push -f origin main
